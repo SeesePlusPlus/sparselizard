@@ -10,8 +10,8 @@ file (GLOB CPP_FILES "src/*.cpp" "src/**/*.cpp")
 file (GLOB H_FILES "src/*.h" "src/**/*.h")
 
 add_library (${PROJECT_NAME} SHARED ${CPP_FILES})
-add_library (${PROJECT_NAME}Static STATIC ${CPP_FILES})
-set_target_properties (${PROJECT_NAME}Static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+add_library (${PROJECT_NAME}_static STATIC ${CPP_FILES})
+set_target_properties (${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 if (LINUX)
   set (INCLUDE_NAME "linux2")
@@ -47,6 +47,7 @@ include_directories (
 )
 
 install (TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+install (TARGETS ${PROJECT_NAME}_static ARCHIVE DESTINATION lib)
 install (DIRECTORY src/ DESTINATION lib/${PROJECT_NAME} FILES_MATCHING PATTERN "*.h")
 
 #add_executable (${PROJECT_NAME} src/main.cpp)
