@@ -45,28 +45,33 @@ OBJECTS=$(CPPS:%.cpp=$(BUILD_DIR)/%.o)
 DEP = $(OBJECTS:%.o=%.d)
 
 all: $(OBJECTS)
-	# The main is always recompiled (it could have been replaced):
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
-	# Linking objects:
-	mkdir -p $(BIN_DIR)
-	$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN_DIR)/$(BIN)
-	make shared-lib
+	@# The main is always recompiled (it could have been replaced):
+	@echo Compiling main.cpp
+	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
+	@# Linking objects:
+	@mkdir -p $(BIN_DIR)
+	@echo Linking $(BIN)
+	@$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN_DIR)/$(BIN)
+	@make shared-lib
+	@echo Done!
 
 include-files:
-	echo $(INCLUDE_FILES)
+	@echo $(INCLUDE_FILES)
 
 # Include all .d files
 -include $(DEP)
 
 $(BUILD_DIR)/%.o: %.cpp
-	# Create the folder of the current target in the build directory:
-	mkdir -p $(@D)
-	# Compile .cpp file. MMD creates the dependencies.
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
+	@# Create the folder of the current target in the build directory:
+	@mkdir -p $(@D)
+	@# Compile .cpp file. MMD creates the dependencies.
+	@echo Compiling $<
+	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
 
 shared-lib:
-	mkdir -p $(LIB_DIR)
-	$(CXX) -shared -o $(LIB_DIR)/lib$(BIN).so $(OBJECTS)
+	@mkdir -p $(LIB_DIR)
+	@echo Linking shared library
+	@$(CXX) -shared -o $(LIB_DIR)/lib$(BIN).so $(OBJECTS)
 
 install:
 	mkdir -p $(INCLUDE_INSTALL_DIR)
@@ -75,5 +80,6 @@ install:
 	cp $(LIB_DIR)/* $(LIB_INSTALL_DIR)
 
 clean :
-	# Removes all files created.
-	rm -rf $(BUILD_DIR)
+	@# Removes all files created.
+	@echo Removing $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
