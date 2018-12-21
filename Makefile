@@ -44,9 +44,6 @@ OBJECTS=$(CPPS:%.cpp=$(BUILD_DIR)/%.o)
 # Gcc/Clang will create these .d files containing dependencies.
 DEP = $(OBJECTS:%.o=%.d)
 
-include-files:
-	echo $(INCLUDE_FILES)
-
 all: $(OBJECTS)
 	# The main is always recompiled (it could have been replaced):
 	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
@@ -54,6 +51,9 @@ all: $(OBJECTS)
 	mkdir -p $(BIN_DIR)
 	$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN_DIR)/$(BIN)
 	make shared-lib
+
+include-files:
+	echo $(INCLUDE_FILES)
 
 # Include all .d files
 -include $(DEP)
