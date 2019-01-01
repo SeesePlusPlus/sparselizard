@@ -27,18 +27,14 @@ COPY install_external_libs/install2_slepc.sh /app/install2_slepc.sh
 RUN /app/install1_petsc.sh
 RUN /app/install2_slepc.sh
 
-RUN git clone https://github.com/SeesePlusPlus/sparselizard.git /app/sparselizard
+COPY . /app/sparselizard
 WORKDIR /app/sparselizard
-RUN git checkout seese++
 RUN mkdir build
 WORKDIR /app/sparselizard/build
 RUN cmake ..
-RUN make
+RUN make VERBOSE=1
 RUN make install
 
-#ADD http://www.sparselizard.org/staticlibs/linux64/sparselizard_linux64_staticlib.zip /app/
-#RUN unzip /app/sparselizard_linux64_staticlib.zip -d ~/SLlibs/
-#RUN cp ~/SLlibs/sparselizard_linux64_staticlib/libsparselizard.a /usr/local/lib/
-
+RUN ldconfig
 RUN rm -rf /app/*
 RUN rm -rf ~/SLlibs

@@ -28,12 +28,7 @@ set (SLEPC_INCLUDE ${DEPENDENCY_PREFIX}/slepc/include)
 set (SLEPC_ARCH ${DEPENDENCY_PREFIX}/slepc/arch-${INCLUDE_NAME}-c-opt)
 
 set (DEPENDENCY_INCLUDES
-  ${PETSC_INCLUDE}/petsc/mpiuni
-  ${PETSC_INCLUDE}
-  ${SLEPC_INCLUDE}
-  ${PETSC_ARCH}/externalpackages/git.openblas
-  ${PETSC_ARCH}/include
-  ${SLEPC_ARCH}/include
+  /usr/local/include
 )
 
 set (PROJECT_INCLUDES
