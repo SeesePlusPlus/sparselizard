@@ -50,7 +50,10 @@ set (PROJECT_INCLUDES
   ${PROJECT_SOURCE_DIR}/src/gausspoint
   ${PROJECT_SOURCE_DIR}/src/shapefunction/lagrange
   ${PROJECT_SOURCE_DIR}/src/mesh
-  ${PROJECT_SOURCE_DIR}/src/mesh/gmsh
+  ${PROJECT_SOURCE_DIR}/src/io
+  ${PROJECT_SOURCE_DIR}/src/gmsh
+  ${PROJECT_SOURCE_DIR}/src/paraview
+  ${PROJECT_SOURCE_DIR}/src/nastran
   ${PROJECT_SOURCE_DIR}/src/resolution
   ${PROJECT_SOURCE_DIR}/src/geometry
 )
