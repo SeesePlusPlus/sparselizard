@@ -7,6 +7,7 @@ include $(external_libs_dir)/petsc/lib/petsc/conf/petscvariables
 ##### THESE ARE THE REQUIRED LIBRARIES:
 
 UNAME := $(shell uname)
+PREFIX := /usr/local/lib/
 
 LIBS = \
 	-L $(external_libs_dir)/petsc/$(PETSC_ARCH)/lib \
@@ -102,6 +103,9 @@ $(BUILD_DIR)/%.o: %.cpp
 shared: $(OBJECTS)
 	$(info $(OBJECTS))
 	$(CXX) -shared -o lib$(BIN).so $(OBJECTS)
+
+install: lib$(BIN).so
+	cp lib$(BIN).so $(PREFIX)
 
 clean :
     # Removes all files created.
