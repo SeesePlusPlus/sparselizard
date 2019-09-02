@@ -27,12 +27,52 @@ INCL = \
 # D can be added to all of the above.
 
 CXX = g++ -fopenmp # openmp is used for parallel sorting on Linux
-CXX_FLAGS= -std=c++11 -O3 -Wno-return-type # Do not warn when not returning anything (e.g. in virtual functions)
+CXX_FLAGS= -std=c++11 -O3 -Wno-return-type -fpic # Do not warn when not returning anything (e.g. in virtual functions)
 
 # List of all directories containing the headers:
-INCLUDES = -I src -I src/field -I src/expression -I src/expression/operation -I src/shapefunction -I src/formulation -I src/shapefunction/hierarchical -I src/shapefunction/hierarchical/h1 -I src/shapefunction/hierarchical/hcurl -I src/shapefunction/hierarchical/meca -I src/gausspoint -I src/shapefunction/lagrange -I src/mesh -I src/io -I src/io/gmsh -I src/io/paraview -I src/io/nastran -I src/resolution -I src/geometry
+INCLUDES = \
+	-I src \
+	-I src/field \
+	-I src/expression \
+	-I src/expression/operation \
+	-I src/shapefunction \
+	-I src/formulation \
+	-I src/shapefunction/hierarchical \
+	-I src/shapefunction/hierarchical/h1 \
+	-I src/shapefunction/hierarchical/hcurl \
+	-I src/shapefunction/hierarchical/meca \
+	-I src/gausspoint \
+	-I src/shapefunction/lagrange \
+	-I src/mesh \
+	-I src/io \
+	-I src/io/gmsh \
+	-I src/io/paraview \
+	-I src/io/nastran \
+	-I src/resolution \
+	-I src/geometry
+
 # List of all .cpp source files:
-CPPS= $(wildcard src/*.cpp) $(wildcard src/field/*.cpp) $(wildcard src/expression/*.cpp) $(wildcard src/expression/operation/*.cpp) $(wildcard src/shapefunction/*.cpp) $(wildcard src/formulation/*.cpp) $(wildcard src/shapefunction/hierarchical/*.cpp) $(wildcard src/shapefunction/hierarchical/h1/*.cpp) $(wildcard src/shapefunction/hierarchical/meca/*.cpp) $(wildcard src/shapefunction/hierarchical/hcurl/*.cpp) $(wildcard src/gausspoint/*.cpp) $(wildcard src/shapefunction/lagrange/*.cpp) $(wildcard src/mesh/*.cpp) $(wildcard src/io/*.cpp) $(wildcard src/io/gmsh/*.cpp) $(wildcard src/io/paraview/*.cpp) $(wildcard src/io/nastran/*.cpp) $(wildcard src/resolution/*.cpp) $(wildcard src/geometry/*.cpp)
+CPPS= \
+	src/*.cpp \
+	src/field/*.cpp \
+	src/expression/*.cpp \
+	src/expression/operation/*.cpp \
+	src/shapefunction/*.cpp \
+	src/formulation/*.cpp \
+	src/shapefunction/hierarchical/*.cpp \
+	src/shapefunction/hierarchical/h1/*.cpp \
+	src/shapefunction/hierarchical/meca/*.cpp \
+	src/shapefunction/hierarchical/hcurl/*.cpp \
+	src/gausspoint/*.cpp \
+	src/shapefunction/lagrange/*.cpp \
+	src/mesh/*.cpp \
+	src/io/*.cpp \
+	src/io/gmsh/*.cpp \
+	src/io/paraview/*.cpp \
+	src/io/nastran/*.cpp \
+	src/resolution/*.cpp \
+	src/geometry/*.cpp
+
 # Final binary name:
 BIN = sparselizard
 # Put all generated stuff to this build directory:
@@ -58,7 +98,10 @@ $(BUILD_DIR)/%.o: %.cpp
 	mkdir -p $(@D)
 	# Compile .cpp file. MMD creates the dependencies.
 	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
-	
+
+shared: $(OBJECTS)
+	$(info $(OBJECTS))
+	$(CXX) -shared -o lib$(BIN).so $(OBJECTS)
 
 clean :
     # Removes all files created.
