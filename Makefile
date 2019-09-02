@@ -7,7 +7,7 @@ include $(external_libs_dir)/petsc/lib/petsc/conf/petscvariables
 ##### THESE ARE THE REQUIRED LIBRARIES:
 
 UNAME := $(shell uname)
-PREFIX := /usr/local/lib/
+PREFIX := /usr/local
 
 LIBS = \
 	-L $(external_libs_dir)/petsc/$(PETSC_ARCH)/lib \
@@ -101,11 +101,12 @@ $(BUILD_DIR)/%.o: %.cpp
 	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
 
 shared: $(OBJECTS)
-	$(info $(OBJECTS))
 	$(CXX) -shared -o lib$(BIN).so $(OBJECTS)
 
 install: lib$(BIN).so
-	cp lib$(BIN).so $(PREFIX)
+	mkdir -p ${PREFIX}/include/$(BIN)
+	find src -name *.h -exec cp {} ${PREFIX}/include/$(BIN) \;
+	cp lib$(BIN).so $(PREFIX)/lib
 
 clean :
     # Removes all files created.
