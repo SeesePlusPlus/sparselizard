@@ -27,78 +27,42 @@ INCL = \
 # $(@D) is the file path of the target file. 
 # D can be added to all of the above.
 
-CXX = g++ -fopenmp # openmp is used for parallel sorting on Linux
-CXX_FLAGS= -std=c++11 -O3 -Wno-return-type -fpic # Do not warn when not returning anything (e.g. in virtual functions)
-
-# List of all directories containing the headers:
-INCLUDES = \
-	-I src \
-	-I src/field \
-	-I src/expression \
-	-I src/expression/operation \
-	-I src/shapefunction \
-	-I src/formulation \
-	-I src/shapefunction/hierarchical \
-	-I src/shapefunction/hierarchical/h1 \
-	-I src/shapefunction/hierarchical/hcurl \
-	-I src/shapefunction/hierarchical/meca \
-	-I src/gausspoint \
-	-I src/shapefunction/lagrange \
-	-I src/mesh \
-	-I src/io \
-	-I src/io/gmsh \
-	-I src/io/paraview \
-	-I src/io/nastran \
-	-I src/resolution \
-	-I src/geometry
-
-# List of all .cpp source files:
-CPPS= \
-	src/*.cpp \
-	src/field/*.cpp \
-	src/expression/*.cpp \
-	src/expression/operation/*.cpp \
-	src/shapefunction/*.cpp \
-	src/formulation/*.cpp \
-	src/shapefunction/hierarchical/*.cpp \
-	src/shapefunction/hierarchical/h1/*.cpp \
-	src/shapefunction/hierarchical/meca/*.cpp \
-	src/shapefunction/hierarchical/hcurl/*.cpp \
-	src/gausspoint/*.cpp \
-	src/shapefunction/lagrange/*.cpp \
-	src/mesh/*.cpp \
-	src/io/*.cpp \
-	src/io/gmsh/*.cpp \
-	src/io/paraview/*.cpp \
-	src/io/nastran/*.cpp \
-	src/resolution/*.cpp \
-	src/geometry/*.cpp
-
 # Final binary name:
 BIN = sparselizard
 # Put all generated stuff to this build directory:
-BUILD_DIR = ./build
+BUILD_DIR ?= ./build
+# Source directories
+SRC_DIRS ?= ./src
 
+# List of all directories containing the headers:
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+
+CXX = g++ -fopenmp # openmp is used for parallel sorting on Linux
+CXX_FLAGS= $(INC_FLAGS) -std=c++11 -O3 -Wno-return-type -fpic # Do not warn when not returning anything (e.g. in virtual functions)
+
+# List of all .cpp source files:
+CPPS := $(shell find src -name \*.cpp -or -name \*.c -or -name \*.s)
 
 # Same list as CPP but with the .o object extension:
-OBJECTS=$(CPPS:%.cpp=$(BUILD_DIR)/%.o)
+OBJECTS=$(CPPS:%=$(BUILD_DIR)/%.o)
 # Gcc/Clang will create these .d files containing dependencies.
-DEP = $(OBJECTS:%.o=%.d)
+DEP = $(OBJECTS:.o=.d)
 
 all: $(OBJECTS)
 	# The main is always recompiled (it could have been replaced):
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
+	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) -c main.cpp -o $(BUILD_DIR)/main.o
 	# Linking objects:
 	$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN)
 	
 # Include all .d files
 -include $(DEP)
 
-$(BUILD_DIR)/%.o: %.cpp
+$(BUILD_DIR)/%.cpp.o: %.cpp
 	# Create the folder of the current target in the build directory:
 	mkdir -p $(@D)
 	# Compile .cpp file. MMD creates the dependencies.
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) -MMD -c $< -o $@
 
 shared: $(OBJECTS)
 	$(CXX) -shared -o lib$(BIN).so $(OBJECTS)
