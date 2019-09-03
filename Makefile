@@ -16,10 +16,10 @@ LIBS = \
 	-l slepc
 INCL = \
 	-I $(external_libs_dir)/petsc/include/petsc/mpiuni \
-	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.openblas \
-	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.slepc/include \
 	-I $(external_libs_dir)/petsc/include/ \
-	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/include/
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/include/ \
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.openblas \
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.slepc/include
 
 # $@ is the filename representing the target.
 # $< is the filename of the first prerequisite.
@@ -33,6 +33,8 @@ BIN = sparselizard
 BUILD_DIR ?= ./build
 # Source directories
 SRC_DIRS ?= ./src
+LIB_INSTALL_DIR := $(PREFIX)/lib/$(BIN)
+INC_INSTALL_DIR := $(PREFIX)/include/$(BIN)
 
 # List of all directories containing the headers:
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
@@ -68,9 +70,12 @@ shared: $(OBJECTS)
 	$(CXX) -shared -o lib$(BIN).so $(OBJECTS)
 
 install: lib$(BIN).so
-	mkdir -p ${PREFIX}/include/$(BIN)
-	find src -name *.h -exec cp {} ${PREFIX}/include/$(BIN) \;
-	cp lib$(BIN).so $(PREFIX)/lib
+	mkdir -p $(INC_INSTALL_DIR)
+	find src -name \*.h -exec cp {} $(INC_INSTALL_DIR) \;
+
+	mkdir -p $(LIB_INSTALL_DIR)
+	cp lib$(BIN).so $(LIB_INSTALL_DIR)
+	find $(external_libs_dir)/petsc/$(PETSC_ARCH)/lib -name lib\*so\* -exec cp -P {} $(LIB_INSTALL_DIR) \;
 
 clean :
     # Removes all files created.
