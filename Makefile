@@ -24,8 +24,8 @@ INCL = \
 
 # With or without the GMSH API:
 ifneq ("$(wildcard $(external_libs_dir)/gmsh)","")
-	LIBS = $(LIBS) -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSHAPI
-	INCL = $(INCL) -I ~/SLlibs/gmsh/include
+	LIBS += -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSHAPI
+	INCL += -I ~/SLlibs/gmsh/include
 endif
 
 # $@ is the filename representing the target.
