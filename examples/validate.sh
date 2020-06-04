@@ -1,5 +1,9 @@
 #!/bin/bash
 
+SCRIPT=$(readlink -f "$0")
+SCRIPTDIR=$(dirname "$SCRIPT")
+EXTERNALLIBSDIR=$SCRIPTDIR/../external_libs/libs
+
 cd ..;
 
 
@@ -7,14 +11,14 @@ cd ..;
 
 if [ "$(uname)" == "Linux" ]; then
 # With or without the GMSH API:
-if [ -d ~/SLlibs/gmsh ]; then
-    LD_LIBRARY_PATH="$HOME/SLlibs/petsc/arch-linux-c-opt/lib":"$HOME/SLlibs/gmsh/lib":$LD_LIBRARY_PATH
+if [ -d "$EXTERNALLIBSDIR/gmsh" ]; then
+    LD_LIBRARY_PATH="$EXTERNALLIBSDIR/petsc/arch-linux-c-opt/lib":"$EXTERNALLIBSDIR/gmsh/lib":$LD_LIBRARY_PATH
 else
-    LD_LIBRARY_PATH="$HOME/SLlibs/petsc/arch-linux-c-opt/lib":$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="$EXTERNALLIBSDIR/petsc/arch-linux-c-opt/lib":$LD_LIBRARY_PATH
 fi
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH    
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 elif [ "$(uname)" == "Darwin"  ]; then
-DYLD_LIBRARY_PATH="$HOME/SLlibs/petsc/arch-darwin-c-opt/lib":$DYLD_LIBRARY_PATH
+DYLD_LIBRARY_PATH="$EXTERNALLIBSDIR/petsc/arch-darwin-c-opt/lib":$DYLD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH
 fi
 
@@ -26,9 +30,9 @@ make -j4;
 
 # LOOP ON ALL EXAMPLES:
 
-echo ''; 
-for i in $(ls examples); 
-do 
+echo '';
+for i in $(ls examples);
+do
 
 # Skip this script as well as all too heavy examples:
 if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ] || [ $i == "superconductor-3d" ] || [ $i == "nonlinear-vonkarman-vortex-2d" ] || [ $i == "thermoacoustic-elasticity-axisymmetry-2d" ]
@@ -36,7 +40,7 @@ then
 continue
 fi
 
-# Copy the example to the main directory: 
+# Copy the example to the main directory:
 cp examples/$i/main.cpp ./;
 cp examples/$i/*.msh ./ 2>/dev/null;
 cp examples/$i/*.nas ./ 2>/dev/null;
@@ -64,7 +68,7 @@ fi
 
 done
 
-echo ''; 
+echo '';
 echo '';
 echo 'ALL OK!';
 

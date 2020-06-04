@@ -1,25 +1,36 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir := $(dir $(mkfile_path))
+external_libs_dir := $(current_dir)external_libs/libs
+
+include $(external_libs_dir)/petsc/lib/petsc/conf/petscvariables
+
+##### THESE ARE THE REQUIRED LIBRARIES:
+
 UNAME := $(shell uname)
 
-ifeq ($(UNAME), Linux)
-# With or without the GMSH API:
-ifneq ("$(wildcard ~/SLlibs/gmsh)","")
-    LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSHAPI
-    INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/ -I ~/SLlibs/gmsh/include
-else
-    LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc
-    INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/
-endif
-endif
-ifeq ($(UNAME), Darwin)
-LIBS = -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l openblas -l petsc -l slepc
-INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-darwin-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/
-endif
+LIBS = \
+	-L $(external_libs_dir)/petsc/$(PETSC_ARCH)/lib \
+	-l openblas \
+	-l petsc \
+	-l slepc
+INCL = \
+	-I $(external_libs_dir)/petsc/include/petsc/mpiuni \
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.openblas \
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/externalpackages/git.slepc/include \
+	-I $(external_libs_dir)/petsc/include/ \
+	-I $(external_libs_dir)/petsc/$(PETSC_ARCH)/include/
 
+
+# With or without the GMSH API:
+ifneq ("$(wildcard $(external_libs_dir)/gmsh)","")
+	LIBS = $(LIBS) -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSHAPI
+	INCL = $(INCL) -I ~/SLlibs/gmsh/include
+endif
 
 # $@ is the filename representing the target.
 # $< is the filename of the first prerequisite.
 # $^ the filenames of all the prerequisites.
-# $(@D) is the file path of the target file. 
+# $(@D) is the file path of the target file.
 # D can be added to all of the above.
 
 CXX = g++ -fopenmp -fPIC -no-pie # openmp is used for parallel sorting on Linux
@@ -48,7 +59,7 @@ all: $(OBJECTS) libsparselizard.so
 	@echo "Linking."
 	@$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN)
 	@echo "Done."
-	
+
 # Include all .d files
 -include $(DEP)
 
@@ -58,7 +69,7 @@ $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@# Compile .cpp file. MMD creates the dependencies.
 	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
-	
+
 
 clean :
 	# Removes all files created.
